@@ -8,6 +8,7 @@ class QsbkSpiderSpider(scrapy.Spider):
     name = 'qsbk_spider'
     allowed_domains = ['qiushibaike.com']
     start_urls = ['https://www.qiushibaike.com/text/page/1/']
+    base_domain = "https://www.qiushibaike.com"
 
     def parse(self, response):
         duanzidivs = response.xpath("//div[@id='content-left']/div")
@@ -18,3 +19,8 @@ class QsbkSpiderSpider(scrapy.Spider):
             duanzi = QsbkItem(author=author,content=content)
             #duanzi = {"author":author,"content":content}
             yield duanzi
+        next_url = response.xpath('//ul[@class="pagination"]/li[last()]/a/@href').get()
+        if not next_url:
+            response
+        else:
+            yield scrapy.Request(self.base_domain+next_url,callback=self.parse)
